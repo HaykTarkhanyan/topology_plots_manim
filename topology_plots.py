@@ -47,9 +47,6 @@ class Id24(Scene):
                 horizontal_distance_from_center = euclidean(point, center)
                 
                 vertical_distance = np.sqrt(radius**2 - horizontal_distance_from_center**2)
-                # print("point", point)
-                # print("hor dist", horizontal_distance_from_center)
-                # print("vertical dist", vertical_distance)
                 pairs.append([point + UP*vertical_distance,
                               point - UP*vertical_distance])
             # print(pairs)
@@ -93,4 +90,78 @@ class Id24(Scene):
         
         
         self.play(Write(Text("a").shift(UP*10)))
-           
+
+class Id31(Scene):
+    def construct(self):
+        line_opacity = 0.4
+        self.camera.background_color = WHITE
+
+        plane = NumberPlane()
+        # self.add(plane)    
+        
+        rect = Rectangle(BLACK, 2, 4)#.set_color(color=BLACK)
+        self.add(rect)
+        
+        
+        
+        lines = VGroup(*[Line(rect.get_left() + DOWN + (rect.get_width()/11)*i*RIGHT, 
+                              rect.get_left() + DOWN + (rect.get_width()/11)*i*RIGHT + rect.get_height()*UP)
+                         .set_opacity(line_opacity)
+                         .set_color(color=BLACK) for i in range(1, 11)])
+        self.add(lines)
+        
+        
+        eq1 = MathTex(r"(a,b) \times (c,d)").move_to(rect.get_center()).scale(1.4).set_color(color=BLACK)
+        
+        # self.add(Rectangle(WHITE, eq1.get_height(), eq1.get_width(), fill_opacity=1).move_to(eq1.get_center()))
+        self.add(eq1)
+        
+        #############################################################
+        # right one
+        circle = Circle().shift(RIGHT*4).set_color(BLACK)
+        self.add(circle)
+        
+        num_lines = 10
+        def get_vertical_points_on_circle(line, radius, num_pairs):
+            center = (line[1] + line[0]) / 2
+            
+            points_on_perimeter = np.linspace(line[0], line[1], num_pairs)
+            
+            print(points_on_perimeter)
+            pairs = []
+            for point in points_on_perimeter:
+                horizontal_distance_from_center = euclidean(point, center)
+                
+                vertical_distance = np.sqrt(radius**2 - horizontal_distance_from_center**2)
+                pairs.append([point + UP*vertical_distance,
+                              point - UP*vertical_distance])
+
+            return pairs[1:-1]
+            
+        points = (get_vertical_points_on_circle([circle.get_left(), circle.get_right()], \
+            circle.get_width()/2, 11))
+
+        for pair in points:
+            self.add(Line(pair[0], pair[1]).set_color(color=BLACK).set_opacity(line_opacity))
+       
+    
+        circle_center = Dot(circle.get_center()).scale(0.8).set_color(color=BLACK)
+        self.add(circle_center)
+        x_label = MathTex("x").next_to(circle_center, DOWN*0.7).set_color(color=BLACK)
+        self.add(x_label)
+       
+        def find_point_on_circle_with_given_x_cord(x_cord, center, radius):
+            y_cord = np.sqrt(radius**2 - (x_cord - center[0])**2)
+            return np.array([x_cord, y_cord, 0])
+
+        cord = Line(circle.get_center(), 
+                    find_point_on_circle_with_given_x_cord(circle.get_center()[0] + 0.7, 
+                                                           circle.get_center(), 
+                                                           circle.get_width()/2)).set_color(color=BLACK)
+        self.add(cord)
+        
+        r_label = MathTex("r").move_to(cord.get_center()+UP*0.3).set_color(color=BLACK)
+
+        self.add(r_label)
+        self.play(Write(Text("a").shift(UP*10)))
+
